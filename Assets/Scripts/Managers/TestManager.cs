@@ -39,23 +39,22 @@ public class TestManager : MonoBehaviour
 
         #region 게임 테스트
         if (Input.GetKeyDown(KeyCode.P))
-            GameManager.Instance.Pause(!GameManager.Instance.IsPaused);
+            GameManager.Instance?.Pause(!GameManager.Instance.IsPaused);
+        if (Input.GetKeyDown(KeyCode.O))
+            GameManager.Instance?.GameOver();
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            isAutoReplay = !isAutoReplay;
+            AutoPlay();
+        }
+        if (isAutoReplay && GameManager.Instance.IsGameOver && playRoutine == null)
+            playRoutine = StartCoroutine(AutoReplay());
 
         if (Input.GetKeyDown(KeyCode.R))
-            GameManager.Instance.Replay();
-
+            GameManager.Instance?.Replay();
         if (Input.GetKeyDown(KeyCode.Q))
-            GameManager.Instance.Quit();
-
-        if (Input.GetKeyDown(KeyCode.G))
-            GameManager.Instance.GameOver();
-
-        if (Input.GetKeyDown(KeyCode.A))
-            isAutoReplay = !isAutoReplay;
-
-        if (isAutoReplay && GameManager.Instance.IsGameOver && playRoutine == null)
-
-            playRoutine = StartCoroutine(AutoReplay());
+            GameManager.Instance?.Quit();
         #endregion
 
         #region 사운드 테스트
@@ -105,16 +104,12 @@ public class TestManager : MonoBehaviour
         }
         #endregion
 
-        #region 액트 테스트
-        if (Input.GetKeyDown(KeyCode.T)) AutoPlay();
-        #endregion
-
         #region 광고 테스트
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.Z))
             ADManager.Instance?.ShowInterAD();
-        if (Input.GetKeyDown(KeyCode.V))
+        if (Input.GetKeyDown(KeyCode.X))
             ADManager.Instance?.ShowReward();
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.C))
         {
             ADManager.Instance?.CreateBanner(!onBanner);
             onBanner = !onBanner;

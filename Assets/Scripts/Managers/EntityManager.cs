@@ -1,7 +1,7 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,7 +9,7 @@ using UnityEditor;
 
 public class EntityManager : MonoBehaviour
 {
-    public static EntityManager Instance { get; private set; }
+    public static EntityManager Instance { private set; get; }
 
     [Header("Data")]
     [SerializeField] private GameObject unitBase;

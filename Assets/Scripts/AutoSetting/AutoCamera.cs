@@ -3,14 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class AutoCamera : MonoBehaviour
 {
+    private Camera cam;
+    private int lw, lh;
+
     [SerializeField] private Vector2 res = new Vector2(1080, 1920);
     [SerializeField] private float baseSize = 12f;
     [SerializeField] private float minSize = 12f;
 
-    public static float SizeDelta { get; private set; } = 0f;
-
-    private Camera cam;
-    private int lw, lh;
+    public static float SizeDelta { private set; get; } = 0f;
 
     private void Awake()
     {
@@ -31,7 +31,6 @@ public class AutoCamera : MonoBehaviour
 
         if (!_force && cw == lw && ch == lh) return;
         lw = cw; lh = ch;
-
         if (ch == 0) return;
 
         float currentAspect = (float)lw / lh;
@@ -42,8 +41,7 @@ public class AutoCamera : MonoBehaviour
         cam.orthographicSize = size;
 
         float delta = size - baseSize;
-        bool sizeChanged = Mathf.Abs(delta - SizeDelta) > 1e-5f;
-        if (sizeChanged)
+        if (Mathf.Abs(delta - SizeDelta) > 1e-5f)
         {
             SizeDelta = delta;
             EntityManager.Instance.SetEntity();

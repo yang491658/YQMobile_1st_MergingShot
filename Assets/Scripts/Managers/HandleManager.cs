@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -8,7 +8,7 @@ using UnityEditor;
 
 public class HandleManager : MonoBehaviour
 {
-    public static HandleManager Instance { get; private set; }
+    public static HandleManager Instance { private set; get; }
 
     private Camera cam => Camera.main;
     private LayerMask unitLayer => LayerMask.GetMask("Unit");

@@ -1,8 +1,7 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -38,6 +37,8 @@ public class UIManager : MonoBehaviour
     [Header("InGame UI")]
     [SerializeField] private GameObject inGameUI;
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI playTimeText;
+    private float playTime = 0f;
     [SerializeField] private Image nextImage;
 
     [Header("InGame UI / Timer")]
@@ -88,6 +89,8 @@ public class UIManager : MonoBehaviour
             inGameUI = GameObject.Find("InGameUI");
         if (scoreText == null)
             scoreText = GameObject.Find("InGameUI/Score/ScoreText").GetComponent<TextMeshProUGUI>();
+        if (playTimeText == null)
+            playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (nextImage == null)
             nextImage = GameObject.Find("InGameUI/Next/NextImage").GetComponent<Image>();
 
@@ -185,6 +188,14 @@ public class UIManager : MonoBehaviour
         UpdateNext(EntityManager.Instance.GetNextSR());
 
         timerPos0 = ((RectTransform)timerSlider.transform).anchoredPosition;
+    }
+
+    private void Update()
+    {
+        if (GameManager.Instance.IsPaused || GameManager.Instance.IsGameOver) return;
+
+        playTime += Time.deltaTime;
+        UpdatePlayTime();
     }
 
     private void OnEnable()
@@ -302,6 +313,15 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region UPDATE
+    public void ResetPlayTime() => playTime = 0;
+
+    private void UpdatePlayTime()
+    {
+        int total = Mathf.FloorToInt(playTime);
+        string s = (total / 60).ToString("00") + ":" + (total % 60).ToString("00");
+        playTimeText.text = s;
+    }
+
     public void UpdateScore(int _score)
     {
         scoreText.text = _score.ToString("0000");
@@ -426,5 +446,19 @@ public class UIManager : MonoBehaviour
 
     public void OnClickOkay() => confirmAction?.Invoke();
     public void OnClickCancel() => OpenConfirm(false);
+    #endregion
+
+    #region SET
+    public void SetInGameUI(float _margin)
+    {
+        var rt = inGameUI.GetComponent<RectTransform>();
+        rt.offsetMax = new Vector3(rt.offsetMax.x, -_margin);
+    }
+    #endregion
+
+    #region GET
+    public bool GetOnSetting() => settingUI.activeSelf;
+    public bool GetOnConfirm() => confirmUI.activeSelf;
+    public bool GetOnResult() => resultUI.activeSelf;
     #endregion
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class SpaceSystem : MonoBehaviour
+public class AutoBackground : MonoBehaviour
 {
     private Camera cam;
     private SpriteRenderer sr;
@@ -28,9 +28,7 @@ public class SpaceSystem : MonoBehaviour
         if (Screen.width != lastW || Screen.height != lastH ||
             !Mathf.Approximately(cam.aspect, lastAspect) ||
             !Mathf.Approximately(cam.orthographicSize, lastOrthoSize))
-        {
             Fit();
-        }
     }
 
     private void OnEnable()

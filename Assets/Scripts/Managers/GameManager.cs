@@ -1,17 +1,20 @@
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance { private set; get; }
 
     [Header("Score")]
     [SerializeField] private int totalScore = 0;
     public event System.Action<int> OnChangeScore;
 
-    public bool IsPaused { get; private set; } = false;
+    public bool IsPaused { private set; get; } = false;
+    public bool IsGameOver { private set; get; } = false;
 
-    public bool IsGameOver { get; private set; } = false;
+    [DllImport("__Internal")] private static extern void GameOverReact();
+    [DllImport("__Internal")] private static extern void ReplayReact();
 
     private void Awake()
     {
@@ -42,6 +45,7 @@ public class GameManager : MonoBehaviour
 
         SoundManager.Instance.PlayBGM("Default");
 
+        UIManager.Instance.ResetPlayTime();
         UIManager.Instance.OpenUI(false);
 
         EntityManager.Instance.CancelRespawn();
@@ -73,44 +77,37 @@ public class GameManager : MonoBehaviour
         Time.timeScale = _pause ? 0f : 1f;
     }
 
-    public void Replay()
+    private void ActWithReward(System.Action _act)
     {
-        if (ADManager.Instance != null)
-            ADManager.Instance.ShowReward(() =>
-            {
-                EntityManager.Instance.CancelRespawn();
-                EntityManager.Instance.DespawnAll();
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            });
-        else
-        {
-            EntityManager.Instance.CancelRespawn();
-            EntityManager.Instance.DespawnAll();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
+        if (ADManager.Instance != null) ADManager.Instance.ShowReward(_act);
+        else _act?.Invoke();
     }
 
-    public void Quit()
+    public void Replay()
     {
-        if (ADManager.Instance != null)
-            ADManager.Instance?.ShowReward(() =>
-            {
-                Time.timeScale = 1f;
-#if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        ReplayReact();
 #else
-                Application.Quit();
+        ActWithReward(ReplayGame);
 #endif
-            });
-        else
-        {
-            Time.timeScale = 1f;
+    }
+
+    private void ReplayGame()
+    {
+        EntityManager.Instance.CancelRespawn();
+        EntityManager.Instance.DespawnAll();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void Quit() => ActWithReward(QuitGame);
+    private void QuitGame()
+    {
+        Time.timeScale = 1f;
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
+        UnityEditor.EditorApplication.isPlaying = false;
 #else
-            Application.Quit();
+        Application.Quit();
 #endif
-        }
     }
 
     public void GameOver()
@@ -121,6 +118,10 @@ public class GameManager : MonoBehaviour
         Pause(true);
         SoundManager.Instance.GameOver();
         UIManager.Instance.OpenResult(true);
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        GameOverReact();
+#endif
     }
     #endregion
 

@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public enum SoundType { BGM, SFX }
 
@@ -13,7 +13,7 @@ public struct SoundClip
 
 public class SoundManager : MonoBehaviour
 {
-    public static SoundManager Instance { get; private set; }
+    public static SoundManager Instance { private set; get; }
 
     [Header("Source")]
     [SerializeField] private AudioSource bgmSource;
@@ -30,7 +30,6 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private SoundClip soundClips;
     private readonly Dictionary<string, AudioClip> bgmDict = new();
     private readonly Dictionary<string, AudioClip> sfxDict = new();
-
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -71,7 +70,7 @@ public class SoundManager : MonoBehaviour
     }
 
     public void Pause(bool _on) => AudioListener.pause = _on;
-    public void Pause(string _on) => AudioListener.pause = _on == "true";
+    public void Pause(string _on) => AudioListener.pause = bool.TryParse(_on, out var v) && v;
 
     #region πË∞Ê¿Ω
     public void PlayBGM(AudioClip _clip)
@@ -159,7 +158,7 @@ public class SoundManager : MonoBehaviour
         SetDictionaries();
     }
 
-    public void SetBGMVolume(float _volume = 1)
+    public void SetBGMVolume(float _volume = 1f)
     {
         bgmVolume = Mathf.Clamp01(_volume);
         bgmSource.volume = bgmVolume;
@@ -170,7 +169,7 @@ public class SoundManager : MonoBehaviour
         OnChangeVolume?.Invoke(SoundType.BGM, bgmVolume);
     }
 
-    public void SetSFXVolume(float _volume = 1)
+    public void SetSFXVolume(float _volume = 1f)
     {
         sfxVolume = Mathf.Clamp01(_volume);
         sfxSource.volume = sfxVolume;

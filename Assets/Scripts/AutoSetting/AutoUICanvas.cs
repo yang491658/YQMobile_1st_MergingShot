@@ -6,7 +6,7 @@ public class AutoUICanvas : MonoBehaviour
 {
     [SerializeField] private Vector2 res = new Vector2(1080, 1920);
     private CanvasScaler scaler;
-    private float lastW, lastH;
+    private int lastW, lastH;
 
     private void Awake()
     {
@@ -32,14 +32,14 @@ public class AutoUICanvas : MonoBehaviour
     {
         if (scaler == null) return;
 
-        float w = Screen.width;
-        float h = Screen.height;
+        int w = Screen.width;
+        int h = Screen.height;
         if (h == 0) return;
-        if (!_force && Mathf.Approximately(w, lastW) && Mathf.Approximately(h, lastH)) return;
+        if (!_force && w == lastW && h == lastH) return;
         lastW = w; lastH = h;
 
-        float current = w / h;
-        float reference = res.x / res.y;
-        scaler.matchWidthOrHeight = current < reference ? 0f : 1f;
+        float current = (float)w / h;
+        float refAspect = res.x / res.y;
+        scaler.matchWidthOrHeight = current < refAspect ? 0f : 1f;
     }
 }

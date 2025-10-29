@@ -1,14 +1,13 @@
-using UnityEngine;
-using System.Collections;
 using GoogleMobileAds.Api;
+using System.Collections;
+using UnityEngine;
 
 public class ADManager : MonoBehaviour
 {
-    public static ADManager Instance { get; private set; }
+    public static ADManager Instance { private set; get; }
 
-   [SerializeField][Min(0)] private float delay = 0.5f;
+    [SerializeField][Min(0)] private float delay = 0.5f;
 
-    private string bannerId;
     private BannerView banner;
 
     private InterstitialAd interAD;
@@ -22,17 +21,21 @@ public class ADManager : MonoBehaviour
     private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
 #elif UNITY_ANDROID
-    private const string BANNER_ID = "ca-app-pub-5275088611290339/8532657443";
+    private const string BANNER_ID = "ca-app-pub-3940256099942544/6300978111";
     private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
-    private const string REWARDED_ID = "ca-app-pub-5275088611290339/5129842326";
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
 #elif UNITY_IPHONE
-    private const string BANNER_ID = "ca-app-pub-5275088611290339/8532657443";
-    private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/4411468910";
-    private const string REWARDED_ID = "ca-app-pub-5275088611290339/5129842326";
+    private const string BANNER_ID = "ca-app-pub-3940256099942544/6300978111";
+    private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
 #else
     private const string BANNER_ID = "ca-app-pub-3940256099942544/6300978111";
     private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
     private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
+#endif
+
+#if UNITY_EDITOR
+    private GameObject adObj;
 #endif
 
     private void Awake()
@@ -51,7 +54,6 @@ public class ADManager : MonoBehaviour
     {
         MobileAds.Initialize(_ => { });
 
-        bannerId = BANNER_ID;
         CreateBanner(true);
         LoadInterAD();
         LoadReward();
@@ -60,11 +62,14 @@ public class ADManager : MonoBehaviour
 #if UNITY_EDITOR
     private void Update()
     {
-        var adObj = GameObject.Find("New Game Object");
-        if (adObj != null)
+        if (adObj == null)
         {
-            adObj.name = "ADPlaceholder";
-            adObj.transform.SetParent(transform);
+            adObj = GameObject.Find("New Game Object");
+            if (adObj != null)
+            {
+                adObj.name = "ADPlaceholder";
+                adObj.transform.SetParent(transform);
+            }
         }
     }
 #endif
@@ -85,16 +90,35 @@ public class ADManager : MonoBehaviour
     {
         if (_show)
         {
+            float margin = 0f;
+
             if (banner == null)
             {
                 var size = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
-                banner = new BannerView(bannerId, size, AdPosition.Top);
+                banner = new BannerView(BANNER_ID, size, AdPosition.Top);
                 banner.LoadAd(new AdRequest());
                 RegisterBanner();
+
+                var go = GameObject.Find("ADAPTIVE(Clone)");
+                if (go != null)
+                {
+                    go.name = "Banner";
+                    go.transform.SetParent(transform);
+
+                    var image = go.transform.Find("Image");
+                    if (image != null)
+                        margin = image.GetComponent<RectTransform>().rect.height;
+                }
             }
             else banner.Show();
+
+            UIManager.Instance?.SetInGameUI(margin);
         }
-        else banner?.Hide();
+        else
+        {
+            banner?.Hide();
+            UIManager.Instance?.SetInGameUI(0f);
+        }
     }
 
     private void RegisterBanner()
