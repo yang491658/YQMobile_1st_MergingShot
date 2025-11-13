@@ -55,7 +55,6 @@ public class UIManager : MonoBehaviour
 	[Header("Setting UI")]
     [SerializeField] private GameObject settingUI;
     [SerializeField] private TextMeshProUGUI settingScoreNum;
-    [SerializeField] private Slider speedSlider;
 
     [Header("Sound UI")]
     [SerializeField] private Slider bgmSlider;
@@ -106,8 +105,6 @@ public class UIManager : MonoBehaviour
             settingUI = GameObject.Find("SettingUI");
         if (settingScoreNum == null)
             settingScoreNum = GameObject.Find("SettingUI/Box/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
-        if (speedSlider == null)
-            speedSlider = GameObject.Find("Speed/SpeedSlider")?.GetComponent<Slider>();
 
         if (bgmSlider == null)
             bgmSlider = GameObject.Find("BGM/BgmSlider")?.GetComponent<Slider>();
@@ -202,11 +199,6 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.Instance.OnChangeScore += UpdateScore;
-        speedSlider.minValue = GameManager.Instance.GetMinSpeed();
-        speedSlider.maxValue = GameManager.Instance.GetMaxSpeed();
-        speedSlider.wholeNumbers = false;
-        speedSlider.value = GameManager.Instance.GetSpeed();
-        speedSlider.onValueChanged.AddListener(GameManager.Instance.SetSpeed);
 
         SoundManager.Instance.OnChangeVolume += UpdateVolume;
         bgmSlider.value = SoundManager.Instance.GetBGMVolume();
@@ -224,7 +216,6 @@ public class UIManager : MonoBehaviour
     private void OnDisable()
     {
         GameManager.Instance.OnChangeScore -= UpdateScore;
-		speedSlider.onValueChanged.RemoveListener(GameManager.Instance.SetSpeed);
 
         SoundManager.Instance.OnChangeVolume -= UpdateVolume;
         bgmSlider.onValueChanged.RemoveListener(SoundManager.Instance.SetBGMVolume);
@@ -440,13 +431,6 @@ public class UIManager : MonoBehaviour
     public void OnClickClose() => OpenUI(false);
     public void OnClickSetting() => OpenSetting(true);
 
-	public void OnClickSpeed()
-    {
-        if (speedSlider.value != 1f)
-            speedSlider.value = 1f;
-        else
-            speedSlider.value = speedSlider.maxValue;
-    }
     public void OnClickBGM() => SoundManager.Instance?.ToggleBGM();
     public void OnClickSFX() => SoundManager.Instance?.ToggleSFX();
 
