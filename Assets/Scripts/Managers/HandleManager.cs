@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -12,6 +13,11 @@ public class HandleManager : MonoBehaviour
 
     private Camera cam => Camera.main;
     private LayerMask layer => LayerMask.GetMask("Unit");
+
+    [Header("Click")]
+    private const float doubleClick = 0.25f;
+    private bool isDoubleClick;
+    private float clickTimer;
 
     [Header("Drag")]
     [SerializeField][Min(0f)] private float maxDrag = 5f;
@@ -274,6 +280,19 @@ public class HandleManager : MonoBehaviour
             }
         }
 
+        if (Time.time - clickTimer < doubleClick)
+        {
+            isDoubleClick = false;
+            clickTimer = 0;
+            OnDouble(worldPos);
+        }
+        else
+        {
+            isDoubleClick = true;
+            clickTimer = Time.time;
+            StartCoroutine(ClickCoroutine(worldPos));
+        }
+
         canDrag = false;
         isDragging = false;
 #if UNITY_EDITOR
@@ -286,6 +305,16 @@ public class HandleManager : MonoBehaviour
         if (maxDrag <= 0f) return _current;
         Vector3 delta = _current - _start;
         return _start + Vector3.ClampMagnitude(delta, maxDrag);
+    }
+
+    private IEnumerator ClickCoroutine(Vector3 _pos)
+    {
+        yield return new WaitForSeconds(doubleClick);
+        if (isDoubleClick)
+        {
+            isDoubleClick = false;
+            OnSingle(_pos);
+        }
     }
     #endregion
 
@@ -369,6 +398,19 @@ public class HandleManager : MonoBehaviour
     #endregion
 
     #region 동작
+    private void OnSingle(Vector3 _pos)
+    {
+#if UNITY_EDITOR
+        AddClick(_pos, Color.cyan);
+#endif
+    }
+
+    private void OnDouble(Vector3 _pos)
+    {
+#if UNITY_EDITOR
+        AddClick(_pos, Color.blue);
+#endif
+    }
     private void OnDragBegin(Vector3 _pos)
     {
         ShowAim(true);
