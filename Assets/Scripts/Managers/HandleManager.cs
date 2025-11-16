@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,6 +18,7 @@ public class HandleManager : MonoBehaviour
     [Header("Drag")]
     [SerializeField][Min(0f)] private float maxDrag = 5f;
     private const float drag = 0.15f;
+    private bool canDrag;
     private bool isDragging;
     private Vector3 dragStart;
     private Vector3 dragCurrent;
@@ -46,6 +48,17 @@ public class HandleManager : MonoBehaviour
     [SerializeField][Min(0.01f)] private float timeLimit = 10f;
     [SerializeField][Range(0f, 90f)] private float angleLimit = 45f;
     public event System.Action<float, float> OnChangeTimer;
+
+#if UNITY_EDITOR
+    [Header("Mark")]
+    [SerializeField] private float markDuration = 1f;
+    [SerializeField] private float markRadius = 0.5f;
+    [SerializeField] private int markSegment = 24;
+    private readonly List<Vector3> marks = new();
+    private readonly List<float> markTimes = new();
+    private readonly List<Color> markColors = new();
+    private readonly List<Vector3> dragPath = new();
+#endif
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -106,6 +119,7 @@ public class HandleManager : MonoBehaviour
 
 #if UNITY_EDITOR
         HandleMouse();
+        DrawDebug();
 #else
         HandleTouch();
 #endif
@@ -179,15 +193,29 @@ public class HandleManager : MonoBehaviour
 
         if (CanSelect(hit))
         {
+            canDrag = true;
             isDragging = false;
             dragStart = worldPos;
             dragCurrent = dragStart;
+#if UNITY_EDITOR
+            dragPath.Clear();
+            dragPath.Add(dragStart);
+#endif
+        }
+        else
+        {
+            canDrag = false;
+            isDragging = false;
+#if UNITY_EDITOR
+            dragPath.Clear();
+#endif
         }
     }
 
     private void HandleMove(Vector3 _pos)
     {
         if (isOverUI) return;
+        if (!canDrag) return;
 
         Vector3 worldPos = ScreenToWorld(_pos);
         float distance = Vector3.Distance(dragStart, worldPos);
@@ -202,6 +230,9 @@ public class HandleManager : MonoBehaviour
         {
             dragCurrent = ClampDrag(dragStart, worldPos);
             OnDragMove(dragStart, dragCurrent);
+#if UNITY_EDITOR
+            dragPath.Add(dragCurrent);
+#endif
         }
     }
 
@@ -210,6 +241,21 @@ public class HandleManager : MonoBehaviour
         if (isOverUI)
         {
             isOverUI = false;
+            canDrag = false;
+            isDragging = false;
+#if UNITY_EDITOR
+            dragPath.Clear();
+#endif
+            return;
+        }
+
+        if (!canDrag)
+        {
+            canDrag = false;
+            isDragging = false;
+#if UNITY_EDITOR
+            dragPath.Clear();
+#endif
             return;
         }
 
@@ -223,11 +269,18 @@ public class HandleManager : MonoBehaviour
             {
                 isDragging = false;
                 OnDragEnd(dragStart, worldPos);
+#if UNITY_EDITOR
+                dragPath.Clear();
+#endif
                 return;
             }
         }
 
+        canDrag = false;
         isDragging = false;
+#if UNITY_EDITOR
+        dragPath.Clear();
+#endif
     }
 
     private Vector3 ClampDrag(Vector3 _start, Vector3 _current)
@@ -361,6 +414,8 @@ public class HandleManager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnRightClick(Vector3 _pos)
     {
+        AddClick(_pos, Color.yellow);
+
         if (IsOverUI()) return;
 
         Collider2D col = Physics2D.OverlapPoint(_pos, layer);
@@ -383,12 +438,58 @@ public class HandleManager : MonoBehaviour
 
     private void OnMiddleClick(Vector3 _pos)
     {
+        AddClick(_pos, Color.red);
+
         if (IsOverUI()) return;
 
         Collider2D col = Physics2D.OverlapPoint(_pos, layer);
 
         if (col != null && col.TryGetComponent(out UnitSystem _unit))
             EntityManager.Instance?.Despawn(_unit);
+    }
+
+    private void AddClick(Vector3 _pos, Color _color)
+    {
+        marks.Add(_pos);
+        markTimes.Add(Time.time + markDuration);
+        markColors.Add(_color);
+    }
+
+    private void DrawDebug()
+    {
+        for (int i = markTimes.Count - 1; i >= 0; i--)
+        {
+            if (Time.time > markTimes[i])
+            {
+                int last = markTimes.Count - 1;
+                (markTimes[i], markTimes[last]) = (markTimes[last], markTimes[i]);
+                (marks[i], marks[last]) = (marks[last], marks[i]);
+                (markColors[i], markColors[last]) = (markColors[last], markColors[i]);
+                markTimes.RemoveAt(last);
+                marks.RemoveAt(last);
+                markColors.RemoveAt(last);
+                continue;
+            }
+
+            Vector3 center = marks[i];
+            Color c = markColors[i];
+            for (int s = 0; s < markSegment; s++)
+            {
+                float a0 = (Mathf.PI * 2f) * s / markSegment;
+                float a1 = (Mathf.PI * 2f) * (s + 1) / markSegment;
+                Vector3 p0 = center + new Vector3(Mathf.Cos(a0), Mathf.Sin(a0)) * markRadius;
+                Vector3 p1 = center + new Vector3(Mathf.Cos(a1), Mathf.Sin(a1)) * markRadius;
+                Debug.DrawLine(p0, p1, c);
+            }
+        }
+
+        if (isDragging)
+        {
+            Debug.DrawLine(dragStart, dragCurrent, Color.green);
+
+            for (int i = 1; i < dragPath.Count; i++)
+                Debug.DrawLine(dragPath[i - 1], dragPath[i], Color.magenta);
+        }
     }
 
     private void HoverOn(Vector2 _pos)
