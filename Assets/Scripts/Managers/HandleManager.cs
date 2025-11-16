@@ -145,7 +145,7 @@ public class HandleManager : MonoBehaviour
     private Vector3 ScreenToWorld(Vector3 _screenPos)
     {
         var p = _screenPos;
-        p.z = -cam.transform.position.z;
+        p.z = Mathf.Max(-cam.transform.position.z, cam.nearClipPlane);
         return cam.ScreenToWorldPoint(p);
     }
 
