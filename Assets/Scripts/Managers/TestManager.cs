@@ -10,7 +10,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] private int testCount = 1;
     [SerializeField] private bool isAutoPlay = false;
     [SerializeField] private bool isAutoReplay = false;
-    [SerializeField][Min(1f)] private float replayTime = 5f;
+    [SerializeField][Min(1f)] private float replayTime = 1f;
     private Coroutine replayRoutine;
 
     [Header("Sound Test")]
@@ -41,8 +41,8 @@ public class TestManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.O))
         {
-            isAutoReplay = !isAutoReplay;
             AutoPlay();
+            isAutoReplay = !isAutoReplay;
         }
         if (isAutoReplay && GameManager.Instance.IsGameOver && replayRoutine == null)
             replayRoutine = StartCoroutine(AutoReplay());
