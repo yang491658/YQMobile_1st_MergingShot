@@ -8,10 +8,9 @@ public class TestManager : MonoBehaviour
 
     [Header("Game Test")]
     [SerializeField] private int testCount = 1;
-    [SerializeField] private bool isAutoPlay = false;
-    [SerializeField] private bool isAutoReplay = false;
-    [SerializeField][Min(1f)] private float replayTime = 1f;
-    private Coroutine replayRoutine;
+    [SerializeField][Min(1f)] private float autoDelay = 1f;
+    private bool isAuto = false;
+    private Coroutine autoRoutine;
 
     [Header("Sound Test")]
     [SerializeField] private bool bgmPause = false;
@@ -41,12 +40,14 @@ public class TestManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.O))
         {
-            GameManager.Instance?.Replay();
+            isAuto = !isAuto;
+
             AutoPlay();
-            isAutoReplay = !isAutoReplay;
+            GameManager.Instance?.Replay();
         }
-        if (isAutoReplay && GameManager.Instance.IsGameOver && replayRoutine == null)
-            replayRoutine = StartCoroutine(AutoReplay());
+        if (isAuto)
+            if (GameManager.Instance.IsGameOver && autoRoutine == null)
+                autoRoutine = StartCoroutine(AutoReplay());
 
         if (Input.GetKeyDown(KeyCode.R))
             GameManager.Instance?.Replay();
@@ -117,15 +118,15 @@ public class TestManager : MonoBehaviour
 
     private void AutoPlay()
     {
-        if (!isAutoPlay)
+        if (!isAuto)
         {
             HandleManager.Instance?.SetTimeLimit(0.01f);
-            isAutoPlay = true;
+            isAuto= true;
         }
         else
         {
             HandleManager.Instance?.SetTimeLimit(10f);
-            isAutoPlay = false;
+            isAuto= false;
         }
     }
 
@@ -134,13 +135,13 @@ public class TestManager : MonoBehaviour
         if (EntityManager.Instance?.GetCount(EntityManager.Instance.GetFinal()) > 0)
             yield return null;
 
-        yield return new WaitForSecondsRealtime(replayTime);
+        yield return new WaitForSecondsRealtime(autoDelay);
         if (GameManager.Instance.IsGameOver)
         {
             testCount++;
             GameManager.Instance?.Replay();
         }
-        replayRoutine = null;
+        autoRoutine = null;
     }
 }
 #endif
