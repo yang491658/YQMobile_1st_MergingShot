@@ -41,6 +41,7 @@ public class TestManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.O))
         {
+            GameManager.Instance?.Replay();
             AutoPlay();
             isAutoReplay = !isAutoReplay;
         }
