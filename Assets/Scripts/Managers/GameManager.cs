@@ -49,7 +49,6 @@ public class GameManager : MonoBehaviour
     {
         Pause(false);
         IsGameOver = false;
-        ResetScore();
 
         SoundManager.Instance?.PlayBGM("Default");
 
@@ -60,21 +59,9 @@ public class GameManager : MonoBehaviour
         EntityManager.Instance?.ResetCount();
         EntityManager.Instance?.SetEntity();
         EntityManager.Instance?.Spawn(1);
-    }
 
-    #region 점수
-    public void ScoreUp(int _score = 1)
-    {
-        score += _score;
-        OnChangeScore?.Invoke(score);
+        ResetScore();
     }
-
-    public void ResetScore()
-    {
-        score = 0;
-        OnChangeScore?.Invoke(score);
-    }
-    #endregion
 
     #region 진행
     public void Pause(bool _pause)
@@ -129,6 +116,20 @@ public class GameManager : MonoBehaviour
 #if UNITY_WEBGL && !UNITY_EDITOR
         GameOverReact();
 #endif
+    }
+    #endregion
+
+    #region 점수
+    public void ScoreUp(int _score = 1)
+    {
+        score += _score;
+        OnChangeScore?.Invoke(score);
+    }
+
+    public void ResetScore()
+    {
+        score = 0;
+        OnChangeScore?.Invoke(score);
     }
     #endregion
 
