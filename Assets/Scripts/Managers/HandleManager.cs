@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -159,6 +160,12 @@ public class HandleManager : MonoBehaviour
     #region 판정
     private bool IsOverUI(int _fingerID = -1)
         => EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(_fingerID);
+
+    private bool IsOverBtn(Vector3 _pos, Button _btn)
+        => RectTransformUtility.RectangleContainsScreenPoint(
+            _btn.GetComponent<RectTransform>(),
+            cam.WorldToScreenPoint(_pos)
+            );
 
     private Vector3 ScreenToWorld(Vector3 _screenPos)
     {
