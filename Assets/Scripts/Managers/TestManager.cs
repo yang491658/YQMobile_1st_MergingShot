@@ -37,6 +37,10 @@ public class TestManager : MonoBehaviour
             GameManager.Instance?.Pause(!GameManager.Instance.IsPaused);
         if (Input.GetKeyDown(KeyCode.G))
             GameManager.Instance?.GameOver();
+        if (Input.GetKeyDown(KeyCode.R))
+            GameManager.Instance?.Replay();
+        if (Input.GetKeyDown(KeyCode.Q))
+            GameManager.Instance?.Quit();
 
         if (Input.GetKeyDown(KeyCode.O))
         {
@@ -48,11 +52,6 @@ public class TestManager : MonoBehaviour
         if (isAuto && !GameManager.Instance.IsPaused)
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
-
-        if (Input.GetKeyDown(KeyCode.R))
-            GameManager.Instance?.Replay();
-        if (Input.GetKeyDown(KeyCode.Q))
-            GameManager.Instance?.Quit();
         #endregion
 
         #region 사운드 테스트
@@ -94,12 +93,8 @@ public class TestManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.S))
             EntityManager.Instance?.Spawn();
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            GameManager.Instance?.ResetScore();
-            EntityManager.Instance?.ResetCount();
+        if (Input.GetKeyDown(KeyCode.Delete))
             EntityManager.Instance?.DespawnAll();
-        }
         #endregion
 
         #region UI 테스트
