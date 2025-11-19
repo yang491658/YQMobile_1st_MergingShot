@@ -45,7 +45,7 @@ public class TestManager : MonoBehaviour
             AutoPlay();
             GameManager.Instance?.Replay();
         }
-        if (isAuto)
+        if (isAuto && !GameManager.Instance.IsPaused)
             if (GameManager.Instance.IsGameOver && autoRoutine == null)
                 autoRoutine = StartCoroutine(AutoReplay());
 
@@ -121,12 +121,12 @@ public class TestManager : MonoBehaviour
         if (!isAuto)
         {
             HandleManager.Instance?.SetTimeLimit(0.01f);
-            isAuto= true;
+            isAuto = true;
         }
         else
         {
             HandleManager.Instance?.SetTimeLimit(10f);
-            isAuto= false;
+            isAuto = false;
         }
     }
 
