@@ -50,10 +50,9 @@ public class GameManager : MonoBehaviour
         Pause(false);
         IsGameOver = false;
 
-        SoundManager.Instance?.PlayBGM("Default");
-
         UIManager.Instance?.ResetUI();
         UIManager.Instance?.OpenUI(false);
+        UIManager.Instance?.StartCountdown();
 
         EntityManager.Instance?.CancelRespawn();
         EntityManager.Instance?.ResetCount();

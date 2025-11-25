@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,9 +35,17 @@ public class UIManager : MonoBehaviour
 
     public event System.Action<bool> OnOpenUI;
 
+    [Header("Count UI")]
+    [SerializeField] private TextMeshProUGUI countText;
+    private Coroutine countRoutine;
+    [SerializeField] private int countStart = 3;
+    [SerializeField] private float countDuration = 1f;
+    [SerializeField] private float countScale = 10f;
+
     [Header("InGame UI")]
     [SerializeField] private GameObject inGameUI;
     [SerializeField] private TextMeshProUGUI playTimeText;
+    private bool onPlayTime = false;
     private float playTime = 0f;
     [SerializeField] private TextMeshProUGUI scoreNum;
 	[SerializeField] private Image nextImage;
@@ -85,6 +94,9 @@ public class UIManager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        if (countText == null)
+            countText = GameObject.Find("CountText")?.GetComponent<TextMeshProUGUI>();
+
         if (inGameUI == null)
             inGameUI = GameObject.Find("InGameUI");
         if (playTimeText == null)
@@ -192,7 +204,11 @@ public class UIManager : MonoBehaviour
     {
         if (GameManager.Instance.IsGameOver) return;
 
-        playTime += Time.unscaledDeltaTime;
+        if (onPlayTime)
+            onPlayTime = false;
+        else
+            playTime += Time.unscaledDeltaTime;
+
         UpdatePlayTime();
     }
 
@@ -226,6 +242,56 @@ public class UIManager : MonoBehaviour
 		EntityManager.Instance.OnChangeNext -= UpdateNext;
 
         OnOpenUI -= GameManager.Instance.Pause;
+    }
+
+    public void StartCountdown()
+    {
+        if (countRoutine != null) StopCoroutine(countRoutine);
+        countRoutine = StartCoroutine(CountCoroutine());
+    }
+
+    private IEnumerator CountCoroutine()
+    {
+        GameManager.Instance?.Pause(true);
+        SoundManager.Instance?.StopBGM();
+        inGameUI.SetActive(false);
+
+        float duration = countDuration;
+        float maxScale = countScale;
+
+        countText.gameObject.SetActive(true);
+
+        for (int i = countStart; i > 0; i--)
+        {
+            countText.text = i.ToString();
+            countText.rectTransform.localScale = Vector3.one;
+
+            SoundManager.Instance?.PlaySFX("Count");
+
+            float start = Time.realtimeSinceStartup;
+
+            while (true)
+            {
+                float elapsed = Time.realtimeSinceStartup - start;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float scale = 1f + Mathf.Sin(t * Mathf.PI) * (maxScale - 1f);
+                countText.rectTransform.localScale = Vector3.one * scale;
+
+                if (elapsed >= duration)
+                    break;
+
+                yield return null;
+            }
+        }
+
+        countText.gameObject.SetActive(false);
+        countText.rectTransform.localScale = Vector3.one;
+
+        GameManager.Instance?.Pause(false);
+        SoundManager.Instance?.PlayBGM("Default");
+        inGameUI.SetActive(true);
+
+        countRoutine = null;
     }
 
     #region 오픈
@@ -312,7 +378,11 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region 업데이트
-    public void ResetUI() => playTime = 0;
+    public void ResetUI()
+    {
+        playTime = 0f;
+        onPlayTime = true;
+    }
 
     public void UpdatePlayTime()
     {
