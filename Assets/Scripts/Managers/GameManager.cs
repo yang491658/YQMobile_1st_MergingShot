@@ -50,14 +50,14 @@ public class GameManager : MonoBehaviour
         Pause(false);
         IsGameOver = false;
 
-        UIManager.Instance?.ResetUI();
-        UIManager.Instance?.OpenUI(false);
-        UIManager.Instance?.StartCountdown();
-
         EntityManager.Instance?.CancelRespawn();
         EntityManager.Instance?.ResetCount();
         EntityManager.Instance?.SetEntity();
         EntityManager.Instance?.Spawn(1);
+
+        UIManager.Instance?.ResetUI();
+        UIManager.Instance?.OpenUI(false);
+        UIManager.Instance?.StartCountdown();
 
         ResetScore();
     }
