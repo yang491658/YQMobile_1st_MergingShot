@@ -382,6 +382,7 @@ public class UIManager : MonoBehaviour
     {
         playTime = 0f;
         onPlayTime = true;
+        UpdatePlayTime();
     }
 
     public void UpdatePlayTime()
