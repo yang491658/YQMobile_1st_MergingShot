@@ -11,22 +11,22 @@ using UnityEditor;
 [System.Serializable]
 public struct PlanetSlot
 {
-	public GameObject go;
-	public Image image;
-	public TextMeshProUGUI text;
+    public GameObject go;
+    public Image image;
+    public TextMeshProUGUI text;
 
-	public PlanetSlot(GameObject obj)
-	{
-		go = obj;
-		image = null;
-		for (int i = 0; i < obj.transform.childCount; i++)
-		{
-			var img = obj.transform.GetChild(i).GetComponent<Image>();
-			if (img != null) { image = img; break; }
-		}
+    public PlanetSlot(GameObject obj)
+    {
+        go = obj;
+        image = null;
+        for (int i = 0; i < obj.transform.childCount; i++)
+        {
+            var img = obj.transform.GetChild(i).GetComponent<Image>();
+            if (img != null) { image = img; break; }
+        }
 
-		text = obj.GetComponentInChildren<TextMeshProUGUI>();
-	}
+        text = obj.GetComponentInChildren<TextMeshProUGUI>();
+    }
 }
 
 public class UIManager : MonoBehaviour
@@ -34,6 +34,7 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { private set; get; }
 
     public event System.Action<bool> OnOpenUI;
+    private static readonly string[] units = { "K", "M", "B", "T" };
 
     [Header("Count UI")]
     [SerializeField] private TextMeshProUGUI countText;
@@ -48,20 +49,20 @@ public class UIManager : MonoBehaviour
     private bool onPlayTime = false;
     private float playTime = 0f;
     [SerializeField] private TextMeshProUGUI scoreNum;
-	[SerializeField] private Image nextImage;
+    [SerializeField] private Image nextImage;
 
-	[Header("InGame UI / Timer")]
-	[SerializeField] private Slider timerSlider;
-	[SerializeField] private Image timerImage;
-	[SerializeField] private TextMeshProUGUI timerTitle;
-	[Space]
-	[SerializeField] private float shakeSpeed = 50f;
-	[SerializeField] private float shakeAmount = 8f;
-	[SerializeField] private Vector2 textSize = new Vector2(0f, 120f);
-	private Vector2 timerPos0;
-	private int lastCountSfx = -1;
+    [Header("InGame UI / Timer")]
+    [SerializeField] private Slider timerSlider;
+    [SerializeField] private Image timerImage;
+    [SerializeField] private TextMeshProUGUI timerTitle;
+    [Space]
+    [SerializeField] private float shakeSpeed = 50f;
+    [SerializeField] private float shakeAmount = 8f;
+    [SerializeField] private Vector2 textSize = new Vector2(0f, 120f);
+    private Vector2 timerPos0;
+    private int lastCountSfx = -1;
 
-	[Header("Setting UI")]
+    [Header("Setting UI")]
     [SerializeField] private GameObject settingUI;
     [SerializeField] private TextMeshProUGUI settingScoreNum;
 
@@ -78,11 +79,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI confirmTitle;
     private System.Action confirmAction;
 
-	[Header("Help UI")]
-	[SerializeField] private GameObject helpUI;
-	[SerializeField] private List<PlanetSlot> helpPlanets = new List<PlanetSlot>();
+    [Header("Help UI")]
+    [SerializeField] private GameObject helpUI;
+    [SerializeField] private List<PlanetSlot> helpPlanets = new List<PlanetSlot>();
 
-	[Header("Result UI")]
+    [Header("Result UI")]
     [SerializeField] private GameObject resultUI;
     [SerializeField] private TextMeshProUGUI resultScoreNum;
 
@@ -103,17 +104,17 @@ public class UIManager : MonoBehaviour
             playTimeText = GameObject.Find("InGameUI/Score/PlayTimeText")?.GetComponent<TextMeshProUGUI>();
         if (scoreNum == null)
             scoreNum = GameObject.Find("InGameUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
-		if (nextImage == null)
-			nextImage = GameObject.Find("InGameUI/Next/NextImage").GetComponent<Image>();
+        if (nextImage == null)
+            nextImage = GameObject.Find("InGameUI/Next/NextImage").GetComponent<Image>();
 
-		if (timerSlider == null)
-			timerSlider = GameObject.Find("InGameUI/Timer").GetComponentInChildren<Slider>();
-		if (timerImage == null)
-			timerImage = GameObject.Find("InGameUI/Timer").GetComponentInChildren<Image>();
-		if (timerTitle == null)
-			timerTitle = GameObject.Find("InGameUI/Timer").GetComponentInChildren<TextMeshProUGUI>();
+        if (timerSlider == null)
+            timerSlider = GameObject.Find("InGameUI/Timer").GetComponentInChildren<Slider>();
+        if (timerImage == null)
+            timerImage = GameObject.Find("InGameUI/Timer").GetComponentInChildren<Image>();
+        if (timerTitle == null)
+            timerTitle = GameObject.Find("InGameUI/Timer").GetComponentInChildren<TextMeshProUGUI>();
 
-		if (settingUI == null)
+        if (settingUI == null)
             settingUI = GameObject.Find("SettingUI");
         if (settingScoreNum == null)
             settingScoreNum = GameObject.Find("SettingUI/Box/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
@@ -140,13 +141,13 @@ public class UIManager : MonoBehaviour
         if (confirmTitle == null)
             confirmTitle = GameObject.Find("ConfirmUI/Box/ConfirmTitle")?.GetComponent<TextMeshProUGUI>();
 
-		if (helpUI == null)
-			helpUI = GameObject.Find("HelpUI");
-		if (helpPlanets == null || helpPlanets.Count == 0)
-			foreach (Transform child in GameObject.Find("HelpUI/Planets").transform)
-				helpPlanets.Add(new PlanetSlot(child.gameObject));
+        if (helpUI == null)
+            helpUI = GameObject.Find("HelpUI");
+        if (helpPlanets == null || helpPlanets.Count == 0)
+            foreach (Transform child in GameObject.Find("HelpUI/Planets").transform)
+                helpPlanets.Add(new PlanetSlot(child.gameObject));
 
-		if (resultUI == null)
+        if (resultUI == null)
             resultUI = GameObject.Find("ResultUI");
         if (resultScoreNum == null)
             resultScoreNum = GameObject.Find("ResultUI/Score/ScoreNum")?.GetComponent<TextMeshProUGUI>();
@@ -195,10 +196,10 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         UpdateScore(GameManager.Instance.GetScore());
-		UpdateNext(EntityManager.Instance?.GetNextSR());
+        UpdateNext(EntityManager.Instance?.GetNextSR());
 
-		timerPos0 = ((RectTransform)timerSlider.transform).anchoredPosition;
-	}
+        timerPos0 = ((RectTransform)timerSlider.transform).anchoredPosition;
+    }
 
     private void Update()
     {
@@ -222,11 +223,11 @@ public class UIManager : MonoBehaviour
         sfxSlider.value = SoundManager.Instance.GetSFXVolume();
         sfxSlider.onValueChanged.AddListener(SoundManager.Instance.SetSFXVolume);
 
-		HandleManager.Instance.OnChangeTimer += UpdateTimer;
+        HandleManager.Instance.OnChangeTimer += UpdateTimer;
 
-		EntityManager.Instance.OnChangeNext += UpdateNext;
+        EntityManager.Instance.OnChangeNext += UpdateNext;
 
-		OnOpenUI += GameManager.Instance.Pause;
+        OnOpenUI += GameManager.Instance.Pause;
     }
 
     private void OnDisable()
@@ -237,13 +238,14 @@ public class UIManager : MonoBehaviour
         bgmSlider.onValueChanged.RemoveListener(SoundManager.Instance.SetBGMVolume);
         sfxSlider.onValueChanged.RemoveListener(SoundManager.Instance.SetSFXVolume);
 
-		HandleManager.Instance.OnChangeTimer -= UpdateTimer;
+        HandleManager.Instance.OnChangeTimer -= UpdateTimer;
 
-		EntityManager.Instance.OnChangeNext -= UpdateNext;
+        EntityManager.Instance.OnChangeNext -= UpdateNext;
 
         OnOpenUI -= GameManager.Instance.Pause;
     }
 
+    #region 기타
     public void StartCountdown()
     {
         if (countRoutine != null) StopCoroutine(countRoutine);
@@ -294,6 +296,36 @@ public class UIManager : MonoBehaviour
         countRoutine = null;
     }
 
+    private string FormatNumber(int _number, bool _full)
+    {
+        if (_full && _number < 10000)
+            return _number.ToString("0000");
+
+        for (int i = units.Length; i > 0; i--)
+        {
+            float n = Mathf.Pow(1000f, i);
+            if (_number >= n)
+            {
+                float value = _number / n;
+
+                if (value >= 100f)
+                    return ((int)value).ToString() + units[i - 1];
+
+                if (value >= 10f)
+                {
+                    float v10 = Mathf.Floor(value * 10f) / 10f;
+                    return v10.ToString("0.0") + units[i - 1];
+                }
+
+                float v100 = Mathf.Floor(value * 100f) / 100f;
+                return v100.ToString("0.00") + units[i - 1];
+            }
+        }
+
+        return _full ? _number.ToString("0000") : _number.ToString();
+    }
+    #endregion
+
     #region 오픈
     public void OpenUI(bool _on)
     {
@@ -302,9 +334,9 @@ public class UIManager : MonoBehaviour
         OpenHelp(_on);
         OpenConfirm(_on);
         OpenSetting(_on);
-	}
+    }
 
-	public void OpenSetting(bool _on)
+    public void OpenSetting(bool _on)
     {
         if (settingUI == null) return;
 
@@ -334,25 +366,25 @@ public class UIManager : MonoBehaviour
         }
 
         if (_pass) _action?.Invoke();
-	}
+    }
 
-	public void OpenHelp(bool _on)
-	{
-		if (helpUI == null) return;
+    public void OpenHelp(bool _on)
+    {
+        if (helpUI == null) return;
 
-		helpUI.SetActive(_on);
-		for (int i = 0; i < helpPlanets.Count; i++)
-		{
-			var u = EntityManager.Instance?.GetDatas()[i];
+        helpUI.SetActive(_on);
+        for (int i = 0; i < helpPlanets.Count; i++)
+        {
+            var u = EntityManager.Instance?.GetDatas()[i];
 
-			helpPlanets[i].go.name = u.Name;
-			helpPlanets[i].image.sprite = u.Image;
-			helpPlanets[i].text.text = u.Name;
-		}
-		OnOpenUI?.Invoke(_on);
-	}
+            helpPlanets[i].go.name = u.Name;
+            helpPlanets[i].image.sprite = u.Image;
+            helpPlanets[i].text.text = u.Name;
+        }
+        OnOpenUI?.Invoke(_on);
+    }
 
-	public void OpenResult(bool _on)
+    public void OpenResult(bool _on)
     {
         if (resultUI == null) return;
 
@@ -394,74 +426,74 @@ public class UIManager : MonoBehaviour
 
     public void UpdateScore(int _score)
     {
-        string s = _score.ToString("0000");
+        string s = FormatNumber(_score, true);
         scoreNum.text = s;
         settingScoreNum.text = s;
         resultScoreNum.text = s;
     }
 
-	private void UpdateNext(Sprite _sprite) => nextImage.sprite = _sprite;
+    private void UpdateNext(Sprite _sprite) => nextImage.sprite = _sprite;
 
-	private void UpdateTimer(float _timer, float _max)
-	{
-		bool isReady = HandleManager.Instance?.GetReady() != null;
-		bool showSlider = isReady && _max >= 3f;
-		timerSlider.gameObject.SetActive(showSlider);
-		if (!showSlider)
-		{
-			timerTitle.gameObject.SetActive(false);
-			((RectTransform)timerSlider.transform).anchoredPosition = timerPos0;
-			timerImage.color = Color.white;
-			timerTitle.color = Color.white;
-			lastCountSfx = -1;
-			return;
-		}
+    private void UpdateTimer(float _timer, float _max)
+    {
+        bool isReady = HandleManager.Instance?.GetReady() != null;
+        bool showSlider = isReady && _max >= 3f;
+        timerSlider.gameObject.SetActive(showSlider);
+        if (!showSlider)
+        {
+            timerTitle.gameObject.SetActive(false);
+            ((RectTransform)timerSlider.transform).anchoredPosition = timerPos0;
+            timerImage.color = Color.white;
+            timerTitle.color = Color.white;
+            lastCountSfx = -1;
+            return;
+        }
 
-		float remain = Mathf.Clamp(_max - _timer, 0f, _max);
-		timerSlider.value = Mathf.Clamp01(remain / _max);
+        float remain = Mathf.Clamp(_max - _timer, 0f, _max);
+        timerSlider.value = Mathf.Clamp01(remain / _max);
 
-		var rt = (RectTransform)timerSlider.transform;
+        var rt = (RectTransform)timerSlider.transform;
 
-		if (remain > 3f || remain <= 0f)
-		{
-			timerTitle.gameObject.SetActive(false);
-			rt.anchoredPosition = timerPos0;
-			timerImage.color = Color.white;
-			timerTitle.color = Color.white;
-			lastCountSfx = -1;
-			return;
-		}
+        if (remain > 3f || remain <= 0f)
+        {
+            timerTitle.gameObject.SetActive(false);
+            rt.anchoredPosition = timerPos0;
+            timerImage.color = Color.white;
+            timerTitle.color = Color.white;
+            lastCountSfx = -1;
+            return;
+        }
 
-		int current = Mathf.Clamp(Mathf.CeilToInt(remain), 1, 3);
-		if (current != lastCountSfx)
-		{
-			SoundManager.Instance?.PlaySFX("Count");
-			lastCountSfx = current;
-		}
+        int current = Mathf.Clamp(Mathf.CeilToInt(remain), 1, 3);
+        if (current != lastCountSfx)
+        {
+            SoundManager.Instance?.PlaySFX("Count");
+            lastCountSfx = current;
+        }
 
-		bool showText = _max >= 8f;
-		timerTitle.gameObject.SetActive(showText);
-		if (showText)
-		{
-			timerTitle.text = current.ToString();
-			float frac = remain - Mathf.Floor(remain);
-			float size = Mathf.Sin(frac * Mathf.PI) * textSize.y;
-			timerTitle.fontSize = size;
-		}
+        bool showText = _max >= 8f;
+        timerTitle.gameObject.SetActive(showText);
+        if (showText)
+        {
+            timerTitle.text = current.ToString();
+            float frac = remain - Mathf.Floor(remain);
+            float size = Mathf.Sin(frac * Mathf.PI) * textSize.y;
+            timerTitle.fontSize = size;
+        }
 
-		float t = Mathf.InverseLerp(3f, 0f, remain);
-		Color color = Color.Lerp(Color.white, Color.red, t);
-		timerImage.color = color;
-		if (showText) timerTitle.color = color;
+        float t = Mathf.InverseLerp(3f, 0f, remain);
+        Color color = Color.Lerp(Color.white, Color.red, t);
+        timerImage.color = color;
+        if (showText) timerTitle.color = color;
 
-		float intensity = 1f - Mathf.Clamp01(remain / 3f);
-		float amp = shakeAmount * intensity * intensity;
-		float sx = Mathf.Sign(Mathf.Sin(Time.unscaledTime * shakeSpeed));
-		float sy = Mathf.Sign(Mathf.Cos(Time.unscaledTime * shakeSpeed));
-		rt.anchoredPosition = timerPos0 + new Vector2(sx, sy) * amp;
-	}
+        float intensity = 1f - Mathf.Clamp01(remain / 3f);
+        float amp = shakeAmount * intensity * intensity;
+        float sx = Mathf.Sign(Mathf.Sin(Time.unscaledTime * shakeSpeed));
+        float sy = Mathf.Sign(Mathf.Cos(Time.unscaledTime * shakeSpeed));
+        rt.anchoredPosition = timerPos0 + new Vector2(sx, sy) * amp;
+    }
 
-	public void UpdateVolume(SoundType _type, float _volume)
+    public void UpdateVolume(SoundType _type, float _volume)
     {
         switch (_type)
         {
@@ -519,7 +551,7 @@ public class UIManager : MonoBehaviour
     public void OnClickReplayDirect() => OpenConfirm(true, "다시", GameManager.Instance.Replay, true);
     public void OnClickQuitDirect() => OpenConfirm(true, "종료", GameManager.Instance.Quit, true);
 
-	public void OnClickHelp() => OpenHelp(true);
+    public void OnClickHelp() => OpenHelp(true);
 
     public void OnClickDetail() => OpenDetail(true);
     public void OnClickBack() => OpenDetail(false);
