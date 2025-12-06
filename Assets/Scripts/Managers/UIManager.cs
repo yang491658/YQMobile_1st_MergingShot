@@ -42,6 +42,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private int countStart = 3;
     [SerializeField] private float countDuration = 1f;
     [SerializeField] private float countScale = 10f;
+    [SerializeField] private bool countSkip;
 
     [Header("InGame UI")]
     [SerializeField] private GameObject inGameUI;
@@ -254,40 +255,43 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator CountCoroutine()
     {
-        GameManager.Instance?.Pause(true);
-        SoundManager.Instance?.StopBGM();
-        inGameUI.SetActive(false);
-
-        float duration = countDuration;
-        float maxScale = countScale;
-
-        countText.gameObject.SetActive(true);
-
-        for (int i = countStart; i > 0; i--)
+        if (!countSkip)
         {
-            countText.text = i.ToString();
-            countText.rectTransform.localScale = Vector3.one;
+            GameManager.Instance?.Pause(true);
+            SoundManager.Instance?.StopBGM();
+            inGameUI.SetActive(false);
 
-            SoundManager.Instance?.PlaySFX("Count");
+            float duration = countDuration;
+            float maxScale = countScale;
 
-            float start = Time.realtimeSinceStartup;
+            countText.gameObject.SetActive(true);
 
-            while (true)
+            for (int i = countStart; i > 0; i--)
             {
-                float elapsed = Time.realtimeSinceStartup - start;
-                float t = Mathf.Clamp01(elapsed / duration);
-                float scale = 1f + Mathf.Sin(t * Mathf.PI) * (maxScale - 1f);
-                countText.rectTransform.localScale = Vector3.one * scale;
+                countText.text = i.ToString();
+                countText.rectTransform.localScale = Vector3.one;
 
-                if (elapsed >= duration)
-                    break;
+                SoundManager.Instance?.PlaySFX("Count");
 
-                yield return null;
+                float start = Time.realtimeSinceStartup;
+
+                while (true)
+                {
+                    float elapsed = Time.realtimeSinceStartup - start;
+                    float t = Mathf.Clamp01(elapsed / duration);
+                    float scale = 1f + Mathf.Sin(t * Mathf.PI) * (maxScale - 1f);
+                    countText.rectTransform.localScale = Vector3.one * scale;
+
+                    if (elapsed >= duration)
+                        break;
+
+                    yield return null;
+                }
             }
-        }
 
-        countText.gameObject.SetActive(false);
-        countText.rectTransform.localScale = Vector3.one;
+            countText.gameObject.SetActive(false);
+            countText.rectTransform.localScale = Vector3.one;
+        }
 
         GameManager.Instance?.Pause(false);
         SoundManager.Instance?.PlayBGM("Default");
@@ -558,6 +562,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region SET
+    public void SetCountdown(bool _skip) => countSkip = _skip;
     public void SetMargin(float _margin)
     {
         var ig = inGameUI.GetComponent<RectTransform>();
