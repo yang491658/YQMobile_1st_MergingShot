@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private int countStart = 3;
     [SerializeField] private float countDuration = 1f;
     [SerializeField] private float countScale = 10f;
-    [SerializeField] private bool countSkip;
+    [SerializeField] private bool countSkip = true;
 
     [Header("InGame UI")]
     [SerializeField] private GameObject inGameUI;
@@ -288,10 +288,10 @@ public class UIManager : MonoBehaviour
                     yield return null;
                 }
             }
-
-            countText.gameObject.SetActive(false);
-            countText.rectTransform.localScale = Vector3.one;
         }
+
+        countText.gameObject.SetActive(false);
+        countText.rectTransform.localScale = Vector3.one;
 
         GameManager.Instance?.Pause(false);
         SoundManager.Instance?.PlayBGM("Default");

@@ -31,6 +31,8 @@ public class TestManager : MonoBehaviour
 
     private void Start()
     {
+        SoundManager.Instance?.ToggleBGM();
+
         AutoPlay();
     }
 
@@ -114,7 +116,6 @@ public class TestManager : MonoBehaviour
     {
         isAuto = !isAuto;
 
-        SoundManager.Instance?.ToggleBGM();
         SoundManager.Instance?.ToggleSFX();
         HandleManager.Instance?.SetTimeLimit(isAuto ? 0.01f : 10f);
     }
