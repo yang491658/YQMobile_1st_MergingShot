@@ -275,10 +275,10 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
-    public void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => Time.timeScale = v);
-    public void ChangeTimeLimit(float _value) => ApplySlider(ref timeLimit, _value, v => HandleManager.Instance?.SetTimeLimit(v));
-    public void ChangeAngleRange(float _value) => ApplySlider(ref angleRange, _value);
-    public void ChangeShotPower(float _value) => ApplySlider(ref shotPower, _value);
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => Time.timeScale = v);
+    private void ChangeTimeLimit(float _value) => ApplySlider(ref timeLimit, _value, v => HandleManager.Instance?.SetTimeLimit(v));
+    private void ChangeAngleRange(float _value) => ApplySlider(ref angleRange, _value);
+    private void ChangeShotPower(float _value) => ApplySlider(ref shotPower, _value);
 
     private void UpdateTestUI()
     {
