@@ -303,6 +303,11 @@ public class TestManager : MonoBehaviour
         totalScore = 0;
         averageScore = 0;
 
+        gameSpeed.value = gameSpeed.minValue;
+        timeLimit.value = timeLimit.minValue;
+        angleRange.value = angleRange.minValue;
+        shotPower.value = shotPower.minValue;
+
         UpdateTestUI();
     }
     public void OnClickReplay() => GameManager.Instance?.Replay();
