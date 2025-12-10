@@ -43,7 +43,7 @@ public class TestManager : MonoBehaviour
     [Header("Test UI")]
     [SerializeField] private GameObject testUI;
     [Space]
-    [SerializeField] private SliderConfig gameSpeed = new SliderConfig(1, 1, 3, "배속 × {0}");
+    [SerializeField] private SliderConfig gameSpeed = new SliderConfig(1, 1, 20, "배속 × {0}");
     [Space]
     [SerializeField] private TextMeshProUGUI testCountNum;
     [SerializeField] private TextMeshProUGUI maxScoreNum;
@@ -204,7 +204,6 @@ public class TestManager : MonoBehaviour
             maxScore = Mathf.Max(score, maxScore);
             averageScore = ++testCount> 0 ? totalScore / testCount : 0;
 
-            ChangeGameSpeed(1f);
             UpdateTestUI();
 
             GameManager.Instance?.Replay();
@@ -254,7 +253,7 @@ public class TestManager : MonoBehaviour
         return v;
     }
 
-    private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterChange = null)
+    private void ApplySlider(ref SliderConfig _config, float _value, System.Action<int> _afterAction = null)
     {
         _config.value = ChangeSlider(_value, _config);
 
@@ -263,7 +262,7 @@ public class TestManager : MonoBehaviour
         else
             _config.TMP.text = string.Format(_config.format, _config.value);
 
-        _afterChange?.Invoke(_config.value);
+        _afterAction?.Invoke(_config.value);
     }
 
     private void UpdateSliderUI(SliderConfig _config)
@@ -275,7 +274,7 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
-    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => Time.timeScale = v);
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance.SetSpeed(v));
     private void ChangeTimeLimit(float _value) => ApplySlider(ref timeLimit, _value, v => HandleManager.Instance?.SetTimeLimit(v));
     private void ChangeAngleRange(float _value) => ApplySlider(ref angleRange, _value);
     private void ChangeShotPower(float _value) => ApplySlider(ref shotPower, _value);
@@ -297,5 +296,20 @@ public class TestManager : MonoBehaviour
         testUI.SetActive(!testUI.activeSelf);
         UpdateTestUI();
     }
+    public void OnClickReset()
+    {
+        testCount = 0;
+        maxScore = 0;
+        totalScore = 0;
+        averageScore = 0;
+
+        gameSpeed.value = gameSpeed.minValue;
+        timeLimit.value = timeLimit.minValue;
+        angleRange.value = angleRange.minValue;
+        shotPower.value = shotPower.minValue;
+
+        UpdateTestUI();
+    }
+    public void OnClickReplay() => GameManager.Instance?.Replay();
     #endregion
 }

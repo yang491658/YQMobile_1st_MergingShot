@@ -135,6 +135,7 @@ public class GameManager : MonoBehaviour
     #region SET
     public void SetSpeed(float _speed)
     {
+        speed = _speed;
         if (!IsPaused) Time.timeScale = speed;
     }
     #endregion
