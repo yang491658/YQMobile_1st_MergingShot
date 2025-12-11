@@ -2982,9 +2982,6 @@ MonoBehaviour:
   powerCoef: 3
   timeLimit: 10
   angleLimit: 45
-  markDuration: 1
-  markRadius: 0.5
-  markSegment: 24
 --- !u!4 &198834868
 Transform:
   m_ObjectHideFlags: 0
@@ -14401,7 +14398,7 @@ MonoBehaviour:
     slider: {fileID: 0}
     value: 1
     minValue: 1
-    maxValue: 20
+    maxValue: 10
     format: "\uBC30\uC18D \xD7 {0}"
   testCountNum: {fileID: 0}
   maxScoreNum: {fileID: 0}

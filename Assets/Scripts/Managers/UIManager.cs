@@ -130,12 +130,12 @@ public class UIManager : MonoBehaviour
             sfxIcon = GameObject.Find("SFX/SfxBtn/SfxIcon")?.GetComponent<Image>();
 
         bgmIcons.Clear();
-        LoadSprite(bgmIcons, "White Music");
-        LoadSprite(bgmIcons, "White Music Off");
+        LoadSprite(bgmIcons, "Music");
+        LoadSprite(bgmIcons, "Music Off");
         sfxIcons.Clear();
-        LoadSprite(sfxIcons, "White Sound On");
-        LoadSprite(sfxIcons, "White Sound Icon");
-        LoadSprite(sfxIcons, "White Sound Off 2");
+        LoadSprite(sfxIcons, "Sound On");
+        LoadSprite(sfxIcons, "Sound Icon");
+        LoadSprite(sfxIcons, "Sound Off 2");
 
         if (confirmUI == null)
             confirmUI = GameObject.Find("ConfirmUI");
