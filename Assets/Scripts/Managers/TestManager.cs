@@ -34,7 +34,7 @@ public class TestManager : MonoBehaviour
     private int totalScore = 0;
     [SerializeField][Min(0)] private int averageScore = 0;
     [SerializeField] private bool isAuto = false;
-    [SerializeField][Min(1f)] private float autoReplay = 1f;
+    [SerializeField][Min(0f)] private float autoReplay = 0f;
     private Coroutine autoRoutine;
 
     [Header("Sound Test")]
