@@ -148,7 +148,7 @@ public class HandleManager : MonoBehaviour
         if (Input.touchCount == 0) return;
         Touch t = Input.GetTouch(0);
 
-        if (t.phase == TouchPhase.Began && !IsOverUI(t.fingerId))
+        if (t.phase == TouchPhase.Began)
             HandleBegin(t.position, t.fingerId);
         else if (t.phase == TouchPhase.Moved || t.phase == TouchPhase.Stationary)
             HandleMove(t.position);
@@ -242,26 +242,8 @@ public class HandleManager : MonoBehaviour
 
     private void HandleEnd(Vector3 _pos)
     {
-        if (isOverUI)
-        {
-            isOverUI = false;
-            canDrag = false;
-            isDragging = false;
-#if UNITY_EDITOR
-            dragPath.Clear();
-#endif
-            return;
-        }
-
-        if (!canDrag)
-        {
-            canDrag = false;
-            isDragging = false;
-#if UNITY_EDITOR
-            dragPath.Clear();
-#endif
-            return;
-        }
+        if (isOverUI) { ResetDrag(); return; }
+        if (!canDrag) { ResetDrag(); return; }
 
         Vector3 worldPos = ScreenToWorld(_pos);
 
@@ -271,11 +253,8 @@ public class HandleManager : MonoBehaviour
             float distance = Vector3.Distance(dragStart, worldPos);
             if (distance >= drag)
             {
-                isDragging = false;
                 OnDragEnd(dragStart, worldPos);
-#if UNITY_EDITOR
-                dragPath.Clear();
-#endif
+                ResetDrag();
                 return;
             }
         }
@@ -293,6 +272,12 @@ public class HandleManager : MonoBehaviour
             StartCoroutine(ClickCoroutine(worldPos));
         }
 
+        ResetDrag();
+    }
+
+    private void ResetDrag()
+    {
+        isOverUI = false;
         canDrag = false;
         isDragging = false;
 #if UNITY_EDITOR
