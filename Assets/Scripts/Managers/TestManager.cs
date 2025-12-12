@@ -202,7 +202,7 @@ public class TestManager : MonoBehaviour
 
             totalScore += score;
             maxScore = Mathf.Max(score, maxScore);
-            averageScore = ++testCount> 0 ? totalScore / testCount : 0;
+            averageScore = totalScore / ++testCount;
 
             UpdateTestUI();
 
@@ -274,7 +274,7 @@ public class TestManager : MonoBehaviour
 
         _config.slider.value = _config.value;
     }
-    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance.SetSpeed(v));
+    private void ChangeGameSpeed(float _value) => ApplySlider(ref gameSpeed, _value, v => GameManager.Instance?.SetSpeed(v));
     private void ChangeTimeLimit(float _value) => ApplySlider(ref timeLimit, _value, v => HandleManager.Instance?.SetTimeLimit(v));
     private void ChangeAngleRange(float _value) => ApplySlider(ref angleRange, _value);
     private void ChangeShotPower(float _value) => ApplySlider(ref shotPower, _value);

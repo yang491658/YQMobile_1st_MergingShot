@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playTimeText;
     private bool onPlayTime = false;
     private float playTime = 0f;
+    private int playTimeSec = -1;
     [SerializeField] private TextMeshProUGUI scoreNum;
     [SerializeField] private Image nextImage;
 
@@ -416,14 +417,18 @@ public class UIManager : MonoBehaviour
     #region 업데이트
     public void ResetUI()
     {
-        playTime = 0f;
         onPlayTime = true;
+        playTime = 0;
+        playTimeSec = -1;
         UpdatePlayTime();
     }
 
     public void UpdatePlayTime()
     {
         int total = Mathf.FloorToInt(playTime);
+        if (total == playTimeSec) return;
+        playTimeSec = total;
+
         string s = (total / 60).ToString("00") + ":" + (total % 60).ToString("00");
         playTimeText.text = s;
     }
